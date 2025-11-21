@@ -4,3 +4,4 @@ sqlmodel
 fastapi-mail
 python-dotenv
 starlette-admin
+gunicorn
