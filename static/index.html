@@ -305,7 +305,7 @@
                             </h3>
                             <span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs font-bold animate-pulse">LIVE</span>
                         </div>
-                        <div class="p-0 max-h-[300px] overflow-y-auto custom-scrollbar">
+                        <div id="social-feed-list" class="p-0 max-h-[300px] overflow-y-auto custom-scrollbar">
                             ${Store.data.liveTweets.map(tweet => `
                                 <div class="p-4 border-b border-slate-100 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                                     <div class="flex justify-between items-start mb-2">
@@ -716,6 +716,34 @@
         // Attach subscription handler after app init
         document.addEventListener('DOMContentLoaded', subscribeHandler);
 
+        // WebSocket for live tweets
+        const socket = new WebSocket('ws://127.0.0.1:8000/ws/tweets');
+
+                socket.addEventListener('message', (event) => {
+                    const tweet = JSON.parse(event.data);
+                    const container = document.getElementById('social-feed-list');
+                    if (!container) return;
+
+                    const sentiment = tweet.sentiment || 'Neutral';
+                    const sentimentClasses = sentiment === 'Positive' ? 'border-green-200 text-green-600 bg-green-50' :
+                                                                 sentiment === 'Negative' ? 'border-red-200 text-red-600 bg-red-50' :
+                                                                 'border-yellow-200 text-yellow-600 bg-yellow-50';
+
+                    const el = document.createElement('div');
+                    el.className = 'p-4 border-b border-slate-100 dark:border-slate-700/50 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-bold text-slate-900 dark:text-white">${tweet.user || '@live'}</span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded ${sentimentClasses}">${sentiment}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">"${(tweet.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}"</p>
+                    `;
+
+                    // Prepend to top
+                    container.prepend(el);
+                    // Keep scroll within boundary — if overflow, ensure newest visible
+                    // optional: container.scrollTop = 0;
+                });
     </script>
 </body>
 </html>
