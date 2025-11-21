@@ -6,5 +6,5 @@ python-dotenv
 starlette-admin
 tweepy
 gunicorn
-TWITTER_BEARER_TOKEN=YOUR_TWITTER_BEARER_TOKEN
+
 pydantic
