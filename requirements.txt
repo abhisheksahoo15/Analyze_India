@@ -1,0 +1,6 @@
+fastapi[all]
+uvicorn
+sqlmodel
+fastapi-mail
+python-dotenv
+starlette-admin
